@@ -10,6 +10,15 @@
 <body>
     <div>
         <h1>Image Framing</h1>
+        <p>custom format: <input type="checkbox" id="custom_format" required name="use custom format"></p>
+        <div id="customization" style="display: none">
+            <p>length of small side for final image: <input type="number" id="reference" required name="small side length" min="1" value="900" step="1"></p>
+            <p>left border length: <input type="number" id="lpad" required name="left border" min="0" value="60" step="1"></p>
+            <p>top border length: <input type="number" id="tpad" required name="top border" min="0" value="60" step="1"></p>
+            <p>right border length: <input type="number" id="rpad" required name="right border" min="0" value="60" step="1"></p>
+            <p>bottom border length: <input type="number" id="bpad" required name="bottom border" min="0" value="225" step="1"></p>
+            <p>make original image square: <input type="checkbox" id="squared" required name="make square image"></p>
+        </div>
         <input type="file" id="file-uploader" accept="image/jpeg">
         <p>Upload an image to add a frame. Please note: The uploaded image should be in square format.</p>
 
@@ -19,9 +28,30 @@
 
     <script src="image-framing.js"></script>
     <script>
+
         const fileUploader = document.getElementById('file-uploader');
 
         let currentImageUrl = null;
+
+        function updateCustomization(checkbox) {
+            if (checkbox.checked) {
+                document.getElementById("customization").style.display="";
+            } else {
+                document.getElementById("customization").style.display="none";
+                // set default values
+                document.getElementById("reference").valueAsNumber = 900;
+                document.getElementById("lpad").valueAsNumber = 60;
+                document.getElementById("tpad").valueAsNumber = 60;
+                document.getElementById("rpad").valueAsNumber = 60;
+                document.getElementById("bpad").valueAsNumber = 225;
+                document.getElementById("squared").checked = false;
+            }
+        }
+        updateCustomization(document.getElementById("custom_format"));
+
+        document.getElementById("custom_format").addEventListener("change", (event) => {
+            updateCustomization(event.target);
+        });
 
         fileUploader.addEventListener('change', (event) => {
             const files = event.target.files;
@@ -36,8 +66,18 @@
 
                 let result = -1;
 
+
                 try {
-                    result = Module.ccall("run", "number", ["string", "string"], ["a.jpg", "a.jpg"]);
+                    result = Module.ccall("run", "number", ["string", "string", "number",
+                                                            "number", "number", "number",
+                                                            "number", "number"],
+                                                            ["a.jpg", "a.jpg",
+                                                            document.getElementById("reference").valueAsNumber,
+                                                            document.getElementById("lpad").valueAsNumber,
+                                                            document.getElementById("tpad").valueAsNumber,
+                                                            document.getElementById("rpad").valueAsNumber,
+                                                            document.getElementById("bpad").valueAsNumber,
+                                                            Number(document.getElementById("squared").checked)]);
                 } catch (error) {
                     console.error(error);
                 }
