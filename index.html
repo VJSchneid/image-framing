@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+    <meta charset="utf-8"/>
+    <title>Image Framing</title>
+    <link rel='stylesheet' type='text/css' media='screen' href='../index.css'>
+</head>
+
+<body>
+    <div>
+        <h1>Image Framing</h1>
+        <input type="file" id="file-uploader" accept="image/jpeg">
+        <p>Upload an image to add a frame. Please note: The uploaded image should be in square format.</p>
+
+        <p id="feedback"></p>
+    </div>
+
+    <script src="image-framing.js"></script>
+    <script type="module" src="FileSaver.js"></script>
+    <script>
+        const fileUploader = document.getElementById('file-uploader');
+
+        fileUploader.addEventListener('change', (event) => {
+            const files = event.target.files;
+
+            document.getElementById('feedback').innerHTML="LOADING...";
+
+            const fr = new FileReader();
+            fr.onload = function() {
+                const data =  new Uint8Array(fr.result);
+                //console.log(data);
+                FS.writeFile("a.jpg", data);
+
+                //console.log(window.URL.createObjectURL(data));
+
+                // show the upload feedback
+                const feedback = document.getElementById('feedback');
+                const msg = `File ${files[0].name} processed successfully!`;
+                feedback.innerHTML = msg;
+
+                result = Module.ccall("run", "number", ["string", "string"], ["a.jpg", "a.jpg"]);
+
+                if (result === 0) {
+                    console.log("creating url...");
+                    img = new File([FS.readFile("a.jpg")], files[0].name, {type: "octet/stream"});
+                    saveAs(img);
+                }
+            }
+            //console.log(files[0]);
+            fr.readAsArrayBuffer(files[0]);
+        });
+
+    </script>
+</body>
+
+</html>
