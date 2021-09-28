@@ -34,7 +34,13 @@
                 //console.log(data);
                 FS.writeFile("a.jpg", data);
 
-                result = Module.ccall("run", "number", ["string", "string"], ["a.jpg", "a.jpg"]);
+                let result = -1;
+
+                try {
+                    result = Module.ccall("run", "number", ["string", "string"], ["a.jpg", "a.jpg"]);
+                } catch (error) {
+                    console.error(error);
+                }
 
                 if (result === 0) {
                     console.log("creating url...");
@@ -49,6 +55,8 @@
                     document.getElementById('result').innerHTML =
                         `<img src="${currentImageUrl}" alt="${files[0].name}" width="512" style="border: 2px dotted grey">`;
 
+                } else {
+                    document.getElementById('feedback').innerHTML = "Failed to load image! (Only JPEG files are supported)";
                 }
             }
 
